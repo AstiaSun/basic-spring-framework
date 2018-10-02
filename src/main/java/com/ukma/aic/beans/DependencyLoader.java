@@ -41,24 +41,24 @@ public class DependencyLoader {
         if (beanName.equals("")) {
             return getDependenciesByType(constructor);
         } else {
-            return getDependencyByName(beanName);
+            return Collections.singletonList(getDependencyByName(beanName));
         }
     }
 
-    private List<Bean> getDependencyByName(String beanName) {
+    private Bean getDependencyByName(String beanName) {
         try {
             return getDependencyByNameOrThrowException(beanName);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return Collections.emptyList();
+        return null;
     }
 
-    private List<Bean> getDependencyByNameOrThrowException(String beanName) throws Exception {
+    private Bean getDependencyByNameOrThrowException(String beanName) throws Exception {
         if (!beans.containsKey(beanName)) {
             throw new Exception("com.ukma.aic.beans.Bean with name='" + beanName + "' is not registered in configuration file");
         }
-        return Collections.singletonList(beans.get(beanName));
+        return beans.get(beanName);
     }
 
     private List<Bean> getDependenciesByType(Constructor constructor) {
@@ -73,7 +73,7 @@ public class DependencyLoader {
             if (beanName.equals("")) {
                 dependencies.addAll(getDependenciesByType(method));
             } else {
-                dependencies.addAll(getDependencyByName(beanName));
+                dependencies.add(getDependencyByName(beanName));
             }
         }
         return dependencies;
@@ -86,7 +86,7 @@ public class DependencyLoader {
             if (beanName.equals("")) {
                 dependencies.add(getDependencyByType(field));
             } else {
-                getDependencyByName(beanName);
+                dependencies.add(getDependencyByName(beanName));
             }
         }
         return dependencies;
@@ -120,11 +120,8 @@ public class DependencyLoader {
     private List<Bean> findBeansToInject(Class<?>[] parameterTypes) {
         List<Bean> parametersToInject = new LinkedList<>();
         for (Class<?> parameterType: parameterTypes) {
-            for(Bean bean: beans.values()) {
-                if (parameterType.isInstance(bean.getBean())) {
-                    parametersToInject.add(bean);
-                }
-            }
+            Bean bean = selectBestBean(parameterType);
+            parametersToInject.add(bean);
         }
         return parametersToInject;
     }

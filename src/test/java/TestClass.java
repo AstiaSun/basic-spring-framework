@@ -1,12 +1,12 @@
 import com.ukma.aic.annotation.Autowired;
 
 public class TestClass {
-    @Autowired
+    @Autowired(name = "firstClass")
     private TestDependentClassOne firstClass;
     private TestDependentClassTwo secondClass;
     private TestDependentClassThree thirdClass;
 
-    @Autowired
+    @Autowired(name = "thirdClass")
     public TestClass(TestDependentClassThree thirdClass) {
         this.thirdClass = thirdClass;
     }
@@ -23,7 +23,7 @@ public class TestClass {
         return secondClass;
     }
 
-    @Autowired
+    @Autowired(name = "secondClass")
     public void setSecondClass(TestDependentClassTwo secondClass) {
         this.secondClass = secondClass;
     }

@@ -12,7 +12,7 @@ import static com.ukma.aic.utils.Utils.getClassByClassPath;
 public class BeanContext {
     private HashMap<String, Bean> beans;
     private XMLConfiguration configuration;
-    private Queue<String> beanCreationQueue;
+    private List<String> beanCreationQueue;
 
     /**
      * When bean context is created, firstly, all beans from configuration file are loaded into the list.

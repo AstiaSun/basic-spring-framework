@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.ukma.aic.utils.Utils.getSetterForField;
 import static com.ukma.aic.utils.Utils.newInstance;
 
 class InstanceCreator {
@@ -24,7 +23,7 @@ class InstanceCreator {
     }
 
     Object createObject(Bean bean) throws BeanNotFoundException {
-        instanceType = bean.getBeanType();
+        init(bean);
         injectDependenciesByConstructor();
         if (instance == null) {
             instance = newInstance(instanceType);
@@ -32,6 +31,11 @@ class InstanceCreator {
         injectDependenciesByAnnotatedMethods();
         injectDependenciesByAnnotatedFields();
         return instance;
+    }
+
+    private void init(Bean bean) {
+        instance = null;
+        instanceType = bean.getBeanType();
     }
 
     private void injectDependenciesByAnnotatedFields() {
@@ -52,12 +56,18 @@ class InstanceCreator {
     }
 
     private Object findObjectToInject(Class parameterType) {
+        Bean selectedBean = null;
         for(Bean bean: beans.values()) {
-            if (bean.getBean() != null && parameterType.isInstance(bean.getBean())) {
-                return bean.getBean();
+            if (bean.getBean() != null) {
+                if (bean.getBeanType().equals(parameterType)) {
+                    selectedBean = bean;
+                    break;
+                } else if (bean.getBeanType().isAssignableFrom(parameterType)) {
+                    selectedBean = bean;
+                }
             }
         }
-        return new Object();
+        return selectedBean == null ? new Object() : selectedBean.getBean();
     }
 
     private void injectDependenciesByAnnotatedMethods() {
@@ -111,16 +121,18 @@ class InstanceCreator {
 
     private void setField(Field field, Object object) {
         try {
-            Method setterForField = getSetterForField(instanceType, field.getName());
-            setterForField.invoke(instance, object);
-        } catch (IllegalAccessException | InvocationTargetException e) {
+            boolean accessible = field.isAccessible();
+            field.setAccessible(true);
+            field.set(instance, object);
+            field.setAccessible(accessible);
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
 
-    private void invokeMethod(Method method, Object... params) {
+    private void invokeMethod(Method method, List<Object> params) {
         try {
-            method.invoke(instance, params);
+            method.invoke(instance, params.toArray());
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
@@ -128,7 +140,7 @@ class InstanceCreator {
 
     private Object createNewInstanceWithConstructor(Constructor constructor, List<Object> parameters) {
         try {
-            constructor.newInstance(parameters);
+            return constructor.newInstance(parameters.toArray());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }

@@ -84,12 +84,12 @@ public class TreeBuilder {
         return currentNode;
     }
 
-    public Queue<String> buildBeanCreationQueue() {
-        Queue<String> beanQueue = new PriorityQueue<>();
+    public LinkedList<String> buildBeanCreationQueue() {
+        LinkedList<String> beanQueue = new LinkedList<>();
         DependencyGraph<Node> savedDependencyGraph = new DependencyGraph<>(dependencyGraph);
         while (dependencyGraph.size() > 0) {
             Node leaf = findLeafAndDeleteFromGraph(dependencyGraph.getFirst());
-            beanQueue.add(leaf.getBeanName());
+            beanQueue.addLast(leaf.getBeanName());
         }
         dependencyGraph = savedDependencyGraph;
         return beanQueue;
