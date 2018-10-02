@@ -1,5 +1,6 @@
 package com.ukma.aic.beans;
 
+import com.ukma.aic.annotations.Autowired;
 import com.ukma.aic.exceptions.BeanNotFoundException;
 import com.ukma.aic.exceptions.DependencyCycleFoundException;
 import com.ukma.aic.graph.TreeBuilder;
@@ -17,7 +18,7 @@ public class BeanContext {
     /**
      * When bean context is created, firstly, all beans from configuration file are loaded into the list.
      * Secondly, dependencies between beans are found and registered. Dependencies are found using
-     * @see com.ukma.aic.annotation.Autowired @Autowired annotation. Next, dependency tree is built.
+     * @see Autowired @Autowired annotation. Next, dependency tree is built.
      * If cycle is found in the tree, an exception is thrown an bean context will not be created.
      * Otherwise, the sequence of bean's instance creations will bw built in order to inject dependencies.
      * When all beans will be initialized, the bean context will be finally created.

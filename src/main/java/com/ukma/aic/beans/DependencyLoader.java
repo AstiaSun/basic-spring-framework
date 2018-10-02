@@ -1,6 +1,6 @@
 package com.ukma.aic.beans;
 
-import com.ukma.aic.annotation.Autowired;
+import com.ukma.aic.annotations.Autowired;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

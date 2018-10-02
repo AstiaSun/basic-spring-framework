@@ -1,6 +1,6 @@
 package com.ukma.aic.beans;
 
-import com.ukma.aic.annotation.Autowired;
+import com.ukma.aic.annotations.Autowired;
 import com.ukma.aic.exceptions.BeanNotFoundException;
 
 import java.lang.reflect.Constructor;
