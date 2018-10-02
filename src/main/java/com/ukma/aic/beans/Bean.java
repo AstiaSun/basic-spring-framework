@@ -4,10 +4,18 @@ public class Bean {
     private Class<?> beanType;
     private String name;
     private Object bean;
+    private BeanCategory beanCategory;
 
     Bean(String name, Class<?> beanType) {
         this.name = name;
         this.beanType = beanType;
+        this.beanCategory = BeanCategory.COMPONENT;
+    }
+
+    Bean(String name, Class<?> beanType, BeanCategory beanCategory) {
+        this.name = name;
+        this.beanType = beanType;
+        this.beanCategory = beanCategory;
     }
 
     Class<?> getBeanType() {
@@ -24,5 +32,9 @@ public class Bean {
 
     void setBean(Object bean) {
         this.bean = bean;
+    }
+
+    public BeanCategory getBeanCategory() {
+        return beanCategory;
     }
 }
