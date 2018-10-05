@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-    <bean id="test1" class="TestClass"/>
-    <bean id="firstClass" class="TestDependentClassOne"/>
-    <bean id="secondClass" class="TestDependentClassTwo"/>
-    <bean id="thirdClass" class="TestDependentClassThree"/>
+    <bean id="simpleAutowired" class="com.ukma.tests.autowired.classes.AutowiredClass"/>
+    <bean id="firstClass" class="com.ukma.tests.autowired.classes.DependentClassOne"/>
+    <bean id="secondClass" class="com.ukma.tests.autowired.classes.DependentClassTwo"/>
+    <bean id="thirdClass" class="com.ukma.tests.autowired.classes.DependentClassThree"/>
+    <bean id="parametereziedAutowired" class="com.ukma.tests.autowired.classes.AutowiredNameClass"/>
 </project>

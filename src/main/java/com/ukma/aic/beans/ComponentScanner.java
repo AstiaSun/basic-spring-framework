@@ -10,14 +10,14 @@ import com.ukma.aic.utils.BeanClassLoader;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
-public class ComponentScanner {
+class ComponentScanner {
 
     private final List<Class<?>> componentAnnotations = Arrays.asList(
             Component.class, Controller.class, Repository.class, Service.class
     );
     private HashMap<Class<?>, IBeanCategoryHandler> classToCategoryMap;
 
-    public ComponentScanner() {
+    ComponentScanner() {
         initClassToCategoryMap();
     }
 
@@ -29,7 +29,7 @@ public class ComponentScanner {
         classToCategoryMap.put(Service.class, new ServiceHandler());
     }
 
-    public List<Bean> scanForAnnotatedBeans(List<String> directoriesToScan) {
+    List<Bean> scanForAnnotatedBeans(List<String> directoriesToScan) {
         List<Class<?>> loadClassesFromPackages = loadClassesFromPackages(directoriesToScan);
         List<Class<?>> annotatedComponents = findAnnotatedComponents(loadClassesFromPackages);
         return createBeans(annotatedComponents);
@@ -52,7 +52,7 @@ public class ComponentScanner {
     }
 
     private boolean isAnnotatedComponent(Class<?> clazz) {
-        for (Annotation annotation: clazz.getDeclaredAnnotations()) {
+        for (Annotation annotation: clazz.getAnnotations()) {
             if (isComponentAnnotation(annotation)) {
                 return true;
             }

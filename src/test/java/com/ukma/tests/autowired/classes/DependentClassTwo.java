@@ -1,6 +1,7 @@
-public class TestDependentClassOne implements TestDependentClass {
-    private String message = "One...";
+package com.ukma.tests.autowired.classes;
 
+public class DependentClassTwo implements IDependentClass {
+    private String message = "Two...";
     public void injectedOperation() {
         System.out.println(message);
     }

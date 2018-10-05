@@ -4,7 +4,6 @@ import com.ukma.aic.beans.Bean;
 import com.ukma.aic.beans.DependencyLoader;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class TreeBuilder {
     private DependencyGraph<Node> dependencyGraph;
@@ -93,12 +92,5 @@ public class TreeBuilder {
         }
         dependencyGraph = savedDependencyGraph;
         return beanQueue;
-    }
-
-    public List<String> getDependentBeanNames(String beanName) {
-        List<Node> dependencies = dependencyGraph.getNodeByName(beanName).getDependencies();
-        return dependencies.stream()
-                .map(Node::getBeanName)
-                .collect(Collectors.toList());
     }
 }

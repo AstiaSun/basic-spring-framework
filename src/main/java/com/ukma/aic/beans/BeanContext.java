@@ -4,15 +4,15 @@ import com.ukma.aic.annotations.Autowired;
 import com.ukma.aic.exceptions.BeanNotFoundException;
 import com.ukma.aic.exceptions.DependencyCycleFoundException;
 import com.ukma.aic.graph.TreeBuilder;
-import org.apache.commons.configuration.XMLConfiguration;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import static com.ukma.aic.utils.Utils.getClassByClassPath;
 
 public class BeanContext {
     private HashMap<String, Bean> beans;
-    private XMLConfiguration configuration;
     private List<String> beanCreationQueue;
 
     /**
@@ -27,10 +27,8 @@ public class BeanContext {
      * @throws DependencyCycleFoundException thrown if cycle is found in dependency tree
      */
     public BeanContext(String configurationFile) throws DependencyCycleFoundException {
-        String pathToConfigurationFile = getConfigurationFile(configurationFile);
-        configuration = new XMLConfiguration();
-        configuration.setFileName(pathToConfigurationFile);
-        loadBeanDescriptionsFromConfigurationFile();
+        beans = new LinkedHashMap<>();
+        loadBeanDescriptionsFromConfigurationFile(configurationFile);
         checkCyclesAndBuildBeanCreationQueue();
         createBeanInstances();
     }
@@ -44,28 +42,43 @@ public class BeanContext {
         beanCreationQueue = treeBuilder.buildBeanCreationQueue();
     }
 
-    private void loadBeanDescriptionsFromConfigurationFile() {
+    private void loadBeanDescriptionsFromConfigurationFile(String configurationFile) {
         try {
-            configuration.load();
-            readBeanDescriptionsFromConfigurationFile();
+            ConfigurationParser configurationParser = new ConfigurationParser(configurationFile);
+            createBeansFromBeanDescriptions(configurationParser);
+            createBeansFromContainers(configurationParser);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void readBeanDescriptionsFromConfigurationFile() throws Exception {
-        List<?> ids = getPropertiesFromConfiguration("bean[@id]");
-        List<?> classes = getPropertiesFromConfiguration("bean[@class]");
-        checkIfListSizeAreEqual(ids, classes);
-        createBeanDescriptions(ids, classes);
+    private void createBeansFromBeanDescriptions(ConfigurationParser configurationParser){
+        List<String> ids = configurationParser.getBeanIds();
+        List<String> classes = configurationParser.getBeanClasses();
+        createBeanDescriptionsIfListSizesAreEqual(ids, classes);
     }
 
-    private void createBeanDescriptions(List<?> ids, List<?> classes) {
-        beans = new LinkedHashMap<>();
+    private void createBeansFromContainers(ConfigurationParser configurationParser) {
+        List<String> componentContainers = configurationParser.getComponentContainers();
+        ComponentScanner componentScanner = new ComponentScanner();
+        List<Bean> componentBeans = componentScanner.scanForAnnotatedBeans(componentContainers);
+        componentBeans.forEach(bean -> beans.put(bean.getName(), bean));
+    }
+
+    private void createBeanDescriptions(List<String> ids, List<String> classes) {
         for (int i = 0; i < ids.size(); i++) {
-            Class<?> aClass = getClassByClassPath((String) classes.get(i));
-            Bean bean = new Bean((String) ids.get(i), aClass);
+            Class<?> aClass = getClassByClassPath(classes.get(i));
+            Bean bean = new Bean(ids.get(i), aClass);
             beans.put(bean.getName(), bean);
+        }
+    }
+
+    private void createBeanDescriptionsIfListSizesAreEqual(List<String> ids, List<String> classes) {
+        try {
+            checkIfListSizeAreEqual(ids, classes);
+            createBeanDescriptions(ids, classes);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -74,22 +87,6 @@ public class BeanContext {
         if (ids.size() != classes.size()) {
             throw new Exception("com.ukma.aic.beans.Bean's id or class is not specified in configuration file");
         }
-    }
-
-    private List<?> getPropertiesFromConfiguration(String xpath) {
-        Object property = configuration.getProperty(xpath);
-        if (property instanceof Collection) {
-            return (List<?>)property;
-        }
-        LinkedList<Object> properties = new LinkedList<>();
-        properties.add(property);
-        return properties;
-    }
-
-
-    private String getConfigurationFile(String filename) {
-        ClassLoader classLoader = getClass().getClassLoader();
-        return classLoader.getResource(filename).getFile();
     }
 
     private void createBeanInstances() {
@@ -110,6 +107,8 @@ public class BeanContext {
     }
 
     public Object loadObject(String beanName) {
+        if (!beans.containsKey(beanName))
+            return null;
         return beans.get(beanName).getBean();
     }
 }

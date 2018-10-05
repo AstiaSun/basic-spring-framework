@@ -27,9 +27,8 @@ public class BeanClassLoader {
     }
 
     private List<Class<?>> loadClassesFromPackageOrThrowException(String packageName) throws IOException {
-        packageName = packageName.replace(".", "/");
-        java.lang.ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        Enumeration<URL> resources = classLoader.getResources(packageName);
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+        Enumeration<URL> resources = classLoader.getResources(packageName.replace(".", "/"));
         List<Class<?>> loadedClasses = new LinkedList<>();
         while (resources.hasMoreElements()) {
             URL resource = resources.nextElement();
@@ -43,17 +42,29 @@ public class BeanClassLoader {
         if (!directory.exists()) {
             return new ArrayList<>();
         }
+        return getClassesInExistingPackage(directory, packageName);
+    }
+
+    private List<Class<?>> getClassesInExistingPackage(File directory, String packageName) {
         List<Class<?>> classes = new LinkedList<>();
         for (File file : directory.listFiles()) {
-            if (!file.isDirectory() && (file.getName().endsWith(".class"))) {
-                String className = file.getName().replace(".class", "");
-                Class loadedClass = loadClass(packageName + "." + className);
-                if (loadedClass != null) {
-                    classes.add(loadedClass);
-                }
-            }
+            loadClassFromFileIfExistsAndAddToList(file, packageName, classes);
         }
         return classes;
+    }
+
+    private void loadClassFromFileIfExistsAndAddToList(File file, String packageName, List<Class<?>> classes) {
+        if (!file.isDirectory() && (file.getName().endsWith(".class"))) {
+            String className = file.getName().replace(".class", "");
+            loadClassAndAddToList(packageName + "." + className, classes);
+        }
+    }
+
+    private void loadClassAndAddToList(String classReference, List<Class<?>> classes) {
+        Class loadedClass = loadClass(classReference);
+        if (loadedClass != null) {
+            classes.add(loadedClass);
+        }
     }
 
     private Class loadClass(String classReference) {
