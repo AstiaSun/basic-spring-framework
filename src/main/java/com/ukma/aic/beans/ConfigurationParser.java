@@ -5,6 +5,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,5 +60,18 @@ class ConfigurationParser {
         return objects.stream()
                 .map(o -> (String) o)
                 .collect(Collectors.toList());
+    }
+
+    HashMap<String, BeanScope> getScopesByIds(List<String> ids) {
+        final String xpath = "bean(i)[@scope]";
+        HashMap<String, BeanScope> resultScopes = new HashMap<>();
+        for (Integer i = 0; i < ids.size(); i++) {
+            Object property = configuration.getProperty(xpath.replace("i", i.toString()));
+            if (property != null) {
+                BeanScope beanScope = BeanScope.valueOf(String.valueOf(property).toUpperCase());
+                resultScopes.put(ids.get(i), beanScope);
+            }
+        }
+        return resultScopes;
     }
 }

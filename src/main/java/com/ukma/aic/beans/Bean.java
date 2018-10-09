@@ -5,17 +5,20 @@ public class Bean {
     private String name;
     private Object bean;
     private BeanCategory beanCategory;
+    private BeanScope beanScope;
 
     Bean(String name, Class<?> beanType) {
         this.name = name;
         this.beanType = beanType;
         this.beanCategory = BeanCategory.COMPONENT;
+        this.beanScope = BeanScope.SINGLETON;
     }
 
     Bean(String name, Class<?> beanType, BeanCategory beanCategory) {
         this.name = name;
         this.beanType = beanType;
         this.beanCategory = beanCategory;
+        this.beanScope = BeanScope.SINGLETON;
     }
 
     Class<?> getBeanType() {
@@ -36,5 +39,13 @@ public class Bean {
 
     public BeanCategory getBeanCategory() {
         return beanCategory;
+    }
+
+    BeanScope getBeanScope() {
+        return beanScope;
+    }
+
+    void setBeanScope(BeanScope beanScope) {
+        this.beanScope = beanScope;
     }
 }

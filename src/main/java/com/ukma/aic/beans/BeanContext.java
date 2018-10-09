@@ -56,6 +56,8 @@ public class BeanContext {
         List<String> ids = configurationParser.getBeanIds();
         List<String> classes = configurationParser.getBeanClasses();
         createBeanDescriptionsIfListSizesAreEqual(ids, classes);
+        HashMap<String, BeanScope> scopesByIds = configurationParser.getScopesByIds(ids);
+        setBeanScopes(scopesByIds);
     }
 
     private void createBeansFromContainers(ConfigurationParser configurationParser) {
@@ -79,6 +81,12 @@ public class BeanContext {
             createBeanDescriptions(ids, classes);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void setBeanScopes(HashMap<String, BeanScope> scopes) {
+        for (String key: scopes.keySet()) {
+            beans.get(key).setBeanScope(scopes.get(key));
         }
     }
 
@@ -109,6 +117,16 @@ public class BeanContext {
     public Object loadObject(String beanName) {
         if (!beans.containsKey(beanName))
             return null;
-        return beans.get(beanName).getBean();
+        return getObjectFromBean(beans.get(beanName));
+    }
+
+    private Object getObjectFromBean(Bean bean) {
+        if (bean.getBeanScope() == BeanScope.SINGLETON) {
+            return bean.getBean();
+        } else if (bean.getBeanScope() == BeanScope.PROTOTYPE) {
+            InstanceCreator instanceCreator = new InstanceCreator(beans);
+            return createBeanInstanceWithDependencies(instanceCreator, bean.getName());
+        }
+        throw new NullPointerException("Bean scope is not set for bean with id=" + bean.getName());
     }
 }
