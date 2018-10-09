@@ -2,10 +2,7 @@ package com.ukma.tests.component;
 
 import com.ukma.aic.beans.BeanContext;
 import com.ukma.aic.exceptions.DependencyCycleFoundException;
-import com.ukma.tests.component.classes.ComponentClass;
-import com.ukma.tests.component.classes.ControllerClass;
-import com.ukma.tests.component.classes.RepositoryClass;
-import com.ukma.tests.component.classes.ServiceClass;
+import com.ukma.tests.component.classes.*;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -39,5 +36,14 @@ public class TestComponentAnnotation {
     public void testLoadRepositoryClass() {
         RepositoryClass testClass = (RepositoryClass) beanContext.loadObject("repositoryClass");
         assert testClass != null;
+    }
+
+    @Test
+    public void testComponentWithDependenciesClass() {
+        ComponentWithDependenciesClass componentClass = (ComponentWithDependenciesClass) beanContext.loadObject("componentWithDependencies");
+        assert componentClass != null;
+        assert componentClass.getComponentClass() != null;
+        assert componentClass.getControllerClass() != null;
+        assert componentClass.getRepositoryClass() != null;
     }
 }
