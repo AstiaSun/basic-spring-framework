@@ -1,6 +1,6 @@
 package com.ukma.aic.beans;
 
-import com.ukma.aic.utils.Constants;
+import com.ukma.aic.utils.ConfigurationParserConstants;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 
@@ -37,22 +37,22 @@ class ConfigurationParser {
         return properties;
     }
 
-    private List<?> getPropertiesFromConfiguration(Constants xpath) {
+    private List<?> getPropertiesFromConfiguration(ConfigurationParserConstants xpath) {
         return getPropertiesFromConfiguration(xpath.toString());
     }
 
     List<String> getBeanIds() {
-        List<?> beanIds = getPropertiesFromConfiguration(Constants.beanIds);
+        List<?> beanIds = getPropertiesFromConfiguration(ConfigurationParserConstants.beanIds);
         return objectsToString(beanIds);
     }
 
     List<String> getBeanClasses() {
-        List<?> beanClasses = getPropertiesFromConfiguration(Constants.beanClasses);
+        List<?> beanClasses = getPropertiesFromConfiguration(ConfigurationParserConstants.beanClasses);
         return objectsToString(beanClasses);
     }
 
     List<String> getComponentContainers() {
-        List<?> containers = getPropertiesFromConfiguration(Constants.componentContainers);
+        List<?> containers = getPropertiesFromConfiguration(ConfigurationParserConstants.componentContainers);
         return objectsToString(containers);
     }
 

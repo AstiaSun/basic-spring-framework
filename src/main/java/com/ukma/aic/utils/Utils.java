@@ -3,6 +3,9 @@ package com.ukma.aic.utils;
 import java.lang.reflect.Method;
 
 public class Utils {
+    public static String LEFT_SECTION_MESSAGE = "\tLeft critical section...\t";
+    public static String ENTERED_SECTION_MESSAGE = "\tInside critical section!\t";
+
     public static Method getSetterForField(Class aClass, String fieldName) {
         Method[] methods = aClass.getDeclaredMethods();
         fieldName = toUpperCaseFirstLetter(fieldName);

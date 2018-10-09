@@ -1,11 +1,11 @@
 package com.ukma.aic.utils;
 
-public enum Constants {
+public enum ConfigurationParserConstants {
     beanIds("bean[@id]"), beanClasses("bean[@class]"), componentContainers("context:component-scan[@base-package]");
 
     private final String name;
 
-    Constants(String s) {
+    ConfigurationParserConstants(String s) {
         name = s;
     }
 

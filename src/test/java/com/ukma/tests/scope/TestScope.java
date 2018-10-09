@@ -1,24 +1,30 @@
 package com.ukma.tests.scope;
 
-import com.ukma.aic.beans.BeanContext;
-import com.ukma.aic.exceptions.DependencyCycleFoundException;
-import com.ukma.tests.autowired.classes.DependentClassOne;
-import com.ukma.tests.autowired.classes.DependentClassTwo;
-import org.testng.annotations.BeforeClass;
+import com.ukma.tests.scope.classes.DependentClassTwo;
 import org.testng.annotations.Test;
 
-public class TestScope {
-    private BeanContext beanContext;
+import java.io.IOException;
+import java.util.List;
 
-    @BeforeClass
-    public void setUpClass() throws DependencyCycleFoundException {
-        beanContext = new BeanContext("singleton_prototype.xml");
-    }
+import static com.ukma.aic.utils.Utils.ENTERED_SECTION_MESSAGE;
+import static com.ukma.aic.utils.Utils.LEFT_SECTION_MESSAGE;
+
+public class TestScope extends BaseTestScope {
+
     @Test
-    public void testSingletonScope() {
-        DependentClassOne firstInstance = (DependentClassOne) beanContext.loadObject("firstClass");
-        DependentClassOne secondInstance = (DependentClassOne) beanContext.loadObject("firstClass");
-        assert firstInstance == secondInstance;
+    public void testSingletonScope() throws InterruptedException, IOException {
+        List<String> testOutput = invokeSingletonBeanMethodsInConcurrentThreadsAndGetOutput();
+        String leftSectionTime = "";
+        String enteredSectionTime = "";
+        for (String line : testOutput) {
+            if (line.contains(LEFT_SECTION_MESSAGE) && line.contains("Thread-1")) {
+                leftSectionTime = line.split("\t")[2];
+            } else if (line.contains(ENTERED_SECTION_MESSAGE) && line.contains("Thread-2")) {
+                enteredSectionTime = line.split("\t")[2];
+            }
+        }
+        assertTrue(Long.valueOf(leftSectionTime) < Long.valueOf(enteredSectionTime),
+                "Left time = " + leftSectionTime + "\nEntered time = " + enteredSectionTime);
     }
 
     @Test

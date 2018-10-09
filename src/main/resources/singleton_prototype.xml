@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
-    <bean id="firstClass" class="com.ukma.tests.autowired.classes.DependentClassOne" scope="singleton"/>
-    <bean id="secondClass" class="com.ukma.tests.autowired.classes.DependentClassTwo" scope="prototype"/>
+    <bean id="firstClass" class="com.ukma.tests.scope.classes.DependentClassOne" scope="singleton"/>
+    <bean id="secondClass" class="com.ukma.tests.scope.classes.DependentClassTwo" scope="prototype"/>
 </project>

@@ -5,6 +5,7 @@ import com.ukma.aic.exceptions.BeanNotFoundException;
 import com.ukma.aic.exceptions.DependencyCycleFoundException;
 import com.ukma.aic.graph.TreeBuilder;
 
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -122,11 +123,19 @@ public class BeanContext {
 
     private Object getObjectFromBean(Bean bean) {
         if (bean.getBeanScope() == BeanScope.SINGLETON) {
-            return bean.getBean();
+            return getSingletonBeanProxy(bean);
         } else if (bean.getBeanScope() == BeanScope.PROTOTYPE) {
             InstanceCreator instanceCreator = new InstanceCreator(beans);
             return createBeanInstanceWithDependencies(instanceCreator, bean.getName());
         }
         throw new NullPointerException("Bean scope is not set for bean with id=" + bean.getName());
+    }
+
+    private Object getSingletonBeanProxy(Bean bean) {
+        return Proxy.newProxyInstance(
+                BeanContext.class.getClassLoader(),
+                bean.getBeanType().getInterfaces(),
+                new SingletonBeanHandler(bean.getBean())
+        );
     }
 }
